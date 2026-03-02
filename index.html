@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>XOX Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+        }
+
+        h1 {
+            margin-top: 20px;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-gap: 5px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .cell {
+            width: 100px;
+            height: 100px;
+            font-size: 40px;
+            font-weight: bold;
+            background: white;
+            border: 2px solid #333;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cell:hover {
+            background: #f1f1f1;
+        }
+
+        #status {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 8px 15px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<h1>XOX Game</h1>
+
+<div class="board" id="board">
+    <div class="cell"></div>
+    <div class="cell"></div>
+    <div class="cell"></div>
+    <div class="cell"></div>
+    <div class="cell"></div>
+    <div class="cell"></div>
+    <div class="cell"></div>
+    <div class="cell"></div>
+    <div class="cell"></div>
+</div>
+
+<div id="status">Player X's Turn</div>
+<button onclick="resetGame()">Restart Game</button>
+
+<script>
+    const cells = document.querySelectorAll(".cell");
+    const statusText = document.getElementById("status");
+
+    let currentPlayer = "X";
+    let gameActive = true;
+    let gameState = ["", "", "", "", "", "", "", "", ""];
+
+    const winPatterns = [
+        [0,1,2], [3,4,5], [6,7,8],  // Rows
+        [0,3,6], [1,4,7], [2,5,8],  // Columns
+        [0,4,8], [2,4,6]            // Diagonals
+    ];
+
+    cells.forEach((cell, index) => {
+        cell.addEventListener("click", () => handleCellClick(cell, index));
+    });
+
+    function handleCellClick(cell, index) {
+        if (gameState[index] !== "" || !gameActive) return;
+
+        gameState[index] = currentPlayer;
+        cell.textContent = currentPlayer;
+
+        checkWinner();
+    }
+
+    function checkWinner() {
+        let roundWon = false;
+
+        for (let pattern of winPatterns) {
+            const [a, b, c] = pattern;
+            if (
+                gameState[a] &&
+                gameState[a] === gameState[b] &&
+                gameState[a] === gameState[c]
+            ) {
+                roundWon = true;
+                break;
+            }
+        }
+
+        if (roundWon) {
+            statusText.textContent = `Player ${currentPlayer} Wins! 🎉`;
+            gameActive = false;
+            return;
+        }
+
+        if (!gameState.includes("")) {
+            statusText.textContent = "It's a Draw!";
+            gameActive = false;
+            return;
+        }
+
+        currentPlayer = currentPlayer === "X" ? "O" : "X";
+        statusText.textContent = `Player ${currentPlayer}'s Turn`;
+    }
+
+    function resetGame() {
+        gameState = ["", "", "", "", "", "", "", "", ""];
+        gameActive = true;
+        currentPlayer = "X";
+        statusText.textContent = "Player X's Turn";
+        cells.forEach(cell => cell.textContent = "");
+    }
+</script>
+
+</body>
+</html>
